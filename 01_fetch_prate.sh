@@ -57,9 +57,9 @@ for ((i=START_HOUR; i<=END_HOUR; i++)); do
   echo "Processing f${hour}..."
   
   # GFSデータをダウンロード
-#   aws s3 cp \
-#     s3://noaa-gfs-bdp-pds/gfs.${DATE}/00/atmos/gfs.t00z.pgrb2.0p25.f${hour} \
-#     gfs.t00z.pgrb2.0p25.f${hour} --no-sign-request
+  aws s3 cp \
+    s3://noaa-gfs-bdp-pds/gfs.${DATE}/00/atmos/gfs.t00z.pgrb2.0p25.f${hour} \
+    gfs.t00z.pgrb2.0p25.f${hour} --no-sign-request
 
   # PRATEを取得（予報時間に応じて適切なパターンを使用）
   docker run --rm -u "$(id -u)":"$(id -g)" \
@@ -67,7 +67,7 @@ for ((i=START_HOUR; i<=END_HOUR; i++)); do
     -match "PRATE:surface:${i} hour fcst:" -grib grib2/prate_${DATE}_${hour}.grib2
   
   # 一時ファイルを削除
-#   rm -f gfs.t00z.pgrb2.0p25.f${hour}
+  rm -f gfs.t00z.pgrb2.0p25.f${hour}
   
   echo "Completed f${hour}"
 done
