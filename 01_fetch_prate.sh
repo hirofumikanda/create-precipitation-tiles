@@ -62,9 +62,17 @@ for ((i=START_HOUR; i<=END_HOUR; i++)); do
     gfs.t00z.pgrb2.0p25.f${hour} --no-sign-request
 
   # PRATEを取得（予報時間に応じて適切なパターンを使用）
-  docker run --rm -u "$(id -u)":"$(id -g)" \
-    -v "$PWD":/work -w /work 28mm/wgrib2 gfs.t00z.pgrb2.0p25.f${hour} \
-    -match "PRATE:surface:${i} hour fcst:" -grib grib2/prate_${DATE}_${hour}.grib2
+  if [ $i -eq 0 ]; then
+    # f000の場合はanl（分析値）を使用
+    docker run --rm -u "$(id -u)":"$(id -g)" \
+      -v "$PWD":/work -w /work 28mm/wgrib2 gfs.t00z.pgrb2.0p25.f${hour} \
+      -match "PRATE:surface:anl:" -grib grib2/prate_${DATE}_${hour}.grib2
+  else
+    # f001以降は予報値を使用
+    docker run --rm -u "$(id -u)":"$(id -g)" \
+      -v "$PWD":/work -w /work 28mm/wgrib2 gfs.t00z.pgrb2.0p25.f${hour} \
+      -match "PRATE:surface:${i} hour fcst:" -grib grib2/prate_${DATE}_${hour}.grib2
+  fi
   
   # 一時ファイルを削除
   rm -f gfs.t00z.pgrb2.0p25.f${hour}
